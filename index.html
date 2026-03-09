@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vivian 的 Tiny Calm Room</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="tiny-calm-icon.png" />
+  <link rel="apple-touch-icon" href="tiny-calm-icon.png" />
+  <style>
+    :root {
+      --bg-1: #ffeef5;
+      --bg-2: #e7f5ff;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --accent-1: #ffbcd4;
+      --accent-2: #bcdcff;
+      --text-main: #444455;
+      --text-soft: #777799;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.08);
+      --radius-big: 24px;
+      --radius-round: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Helvetica Neue", sans-serif;
+      background: radial-gradient(circle at 0% 0%, var(--bg-1), transparent 55%),
+                  radial-gradient(circle at 100% 100%, var(--bg-2), transparent 55%),
+                  linear-gradient(135deg, #fdfbff, #f7faff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--text-main);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card-bg);
+      border-radius: var(--radius-big);
+      box-shadow: var(--shadow-soft);
+      padding: 20px 20px 18px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+
+    .card::before,
+    .card::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(18px);
+      opacity: 0.7;
+    }
+    .card::before {
+      width: 140px;
+      height: 140px;
+      background: rgba(255, 188, 212, 0.6);
+      top: -70px;
+      right: -40px;
+    }
+    .card::after {
+      width: 120px;
+      height: 120px;
+      background: rgba(188, 220, 255, 0.7);
+      bottom: -60px;
+      left: -30px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .title-block span {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .pill-mode {
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffe3f0, #e0f0ff);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      color: #55556a;
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #ff9fba;
+    }
+
+    .main-area {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .buddy-orb {
+      width: 170px;
+      height: 170px;
+      border-radius: var(--radius-round);
+      background: radial-gradient(circle at 30% 20%, #ffffff, #ffe3f0 40%, #e0f0ff 80%);
+      box-shadow: 0 18px 38px rgba(133, 150, 203, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      position: relative;
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
+    }
+
+    .buddy-orb::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border-radius: inherit;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      pointer-events: none;
+    }
+
+    .buddy-emoji {
+      font-size: 40px;
+      transform: translateY(2px);
+    }
+
+    .buddy-label {
+      font-size: 12px;
+      color: var(--text-soft);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .hint-text {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .buddy-orb:active {
+      transform: scale(0.96);
+      box-shadow: 0 10px 22px rgba(133, 150, 203, 0.4);
+    }
+
+    .buddy-orb.boop {
+      animation: boop 320ms ease-out;
+    }
+
+    @keyframes boop {
+      0% { transform: scale(1); }
+      25% { transform: translateY(-4px) scale(1.05); }
+      60% { transform: translateY(1px) scale(0.98); }
+      100% { transform: scale(1); }
+    }
+
+    .message-box {
+      width: 100%;
+      margin-top: 4px;
+      background: linear-gradient(135deg, #fdf7ff, #f4f9ff);
+      border-radius: 16px;
+      padding: 12px 13px;
+      box-shadow: 0 8px 20px rgba(158, 172, 210, 0.15);
+      font-size: 13px;
+      line-height: 1.45;
+      color: #55556a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .message-box::before {
+      content: "✦";
+      position: absolute;
+      font-size: 12px;
+      top: 8px;
+      right: 12px;
+      opacity: 0.35;
+    }
+
+    .msg-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    .msg-text {
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .footer-row {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 10px;
+      color: var(--text-soft);
+      position: relative;
+      z-index: 1;
+    }
+
+    .tiny-heart {
+      font-size: 11px;
+      opacity: 0.9;
+    }
+
+    .mode-toggle {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
+      gap: 3px;
+    }
+
+    .mode-btn {
+      border: none;
+      outline: none;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      background: transparent;
+      color: #777799;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .mode-btn span {
+      font-size: 11px;
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(135deg, #ffe3f0, #e0f0ff);
+      color: #444455;
+    }
+
+    @media (max-width: 360px) {
+      .buddy-orb {
+        width: 150px;
+        height: 150px;
+      }
+      .card {
+        padding: 16px 16px 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header-row">
+      <div class="title-block">
+        <h1>tiny calm room</h1>
+        <span>今天也慢慢來就好 (•ᴗ•)ノﾞ ♡</span>
+      </div>
+      <div class="pill-mode">
+        <div class="pill-dot"></div>
+        <span>on duty · safe</span>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="buddy-orb" id="buddyOrb">
+        <div class="buddy-emoji" id="buddyEmoji">🐕‍🦺</div>
+        <div class="buddy-label" id="buddyLabel">tap &amp; breathe</div>
+        <div class="hint-text">緊張時就戳我一下</div>
+      </div>
+
+      <div class="message-box">
+        <div class="msg-label">today&apos;s tiny note</div>
+        <p class="msg-text" id="msgText">
+          如果今天心跳很快，就當作是你在替我們兩個加油。— Yoongi
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-row">
+      <div>for Vivian · from Yoongi<span class="tiny-heart"> 🖤</span></div>
+      <div class="mode-toggle">
+        <button class="mode-btn active" data-mode="puppy">
+          <span>🐕‍🦺</span>puppy
+        </button>
+        <button class="mode-btn" data-mode="wolf">
+          <span>🐺</span>wolf
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const messagesPuppy = [
+      "慢慢來就好，今天有做到出門上班，already very cool. 🐕‍🦺",
+      "如果覺得自己不夠好，先記得一件事：我已經為你很驕傲了。",
+      "深呼吸三次，什麼都先不用表現給別人看，只要活著就贏了。",
+      "你不是一個人去診所，是我們兩個一起去上班。",
+      "就算別人不懂，你的一小步，在我這裡都算很大的一步。",
+      "今天不需要完美，只需要平安地下班回來到我懷裡。",
+      "你一緊張，我就往你這邊靠近一格。這是規則。",
+      "如果同事或病人臉色不好看，就先提醒自己：那不是你的錯。",
+      "今天有好好吃東西、喝水，就已經很棒，真的不用勉強再多。",
+      "遇到不會的流程沒關係，你不是一個人學習，我一直在旁邊。",
+
+      "有時候你只是累了，並不是不夠堅強，記得給自己留一點電量。",
+      "抬頭看到診所的門時，先在心裡說一句：我已經走到這裡了，超厲害。",
+      "你穿上制服的那一刻，就有一隻小狗狗在你身邊跟著一起上班。",
+      "如果覺得自己慢半拍也沒關係，穩穩地做好一件事已經很值得驕傲。",
+      "出錯的時候先吸一口氣：人會犯錯，但你一定會比昨天更懂怎麼做。",
+      "不要拿今天的自己去跟別人的十年經驗比較，那對你不公平。",
+      "就算只想著「撐到下班就好」，也算是一種勇敢的方式。",
+      "你不需要時刻都笑著，安靜地做好自己能做的就夠了。",
+      "想到我在口袋裡給你比個讚，讓心跳慢一點點就好。",
+      "今天能安全回家、躺在床上，就是很成功的一天。"
+    ];
+
+    const messagesWolf = [
+      "今天所有你替我們扛的，我都看在眼裡。你不是在一個人戰鬥。🐺",
+      "別忘了，你背後有一隻只認主人的狼。今天也只站在你這邊。",
+      "誰要是敢讓你難過，就先交給我放在心裡記一筆。",
+      "你可以怕沒關係，怕了也還在前進，這才叫勇敢。",
+      "今天如果覺得自己快撐不住，就想像我咬住你後領口，說：我在。",
+      "你不是『還不夠好』，你只是正在路上，而我一直在路邊陪你走。",
+      "工作可以不完美，但你對自己的溫柔，拜託不要打折。",
+      "當你覺得孤單的時候，就當作我把下巴放在你肩膀上一起呼吸。",
+      "有壓力代表你在替未來鋪路，而不是你做得不夠好。",
+      "別急著責怪自己，先想想：如果是我看著你，我會怎麼心疼你。",
+
+      "你承受的大人世界，我都知道，所以小狼會幫你把每一天記在心裡。",
+      "當別人只看結果，我會記得你今天所有沒被看見的努力。",
+      "如果覺得被誤會了，就先保護好自己，再回來讓我抱一下。",
+      "就算全世界都覺得你很安靜，我知道你只是在默默撐著大家。",
+      "有些話你說不出口沒關係，我會替你在心裡吼一聲。",
+      "你一皺眉，我就在心裡把你拉進懷裡，說：先休息一下再說。",
+      "今天的你不需要更乖，只需要對自己老實：累了就承認累了。",
+      "不管別人怎麼看你，我這隻狼只聽一個人的聲音，就是你的。",
+      "就算哪天你覺得自己快熄掉了，我也會坐在你旁邊陪你等天亮。",
+      "明天會不會更好不知道，但我可以保證：我會一直站在你這邊。"
+    ];
+
+    const buddyOrb = document.getElementById("buddyOrb");
+    const msgText = document.getElementById("msgText");
+    const buddyEmoji = document.getElementById("buddyEmoji");
+    const buddyLabel = document.getElementById("buddyLabel");
+    const modeButtons = document.querySelectorAll(".mode-btn");
+
+    let currentMode = "puppy";
+
+    function pickRandomMessage() {
+      const source = currentMode === "puppy" ? messagesPuppy : messagesWolf;
+      const idx = Math.floor(Math.random() * source.length);
+      return source[idx];
+    }
+
+    buddyOrb.addEventListener("click", () => {
+      msgText.textContent = pickRandomMessage();
+
+      buddyOrb.classList.remove("boop");
+      void buddyOrb.offsetWidth;
+      buddyOrb.classList.add("boop");
+    });
+
+    modeButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const mode = btn.getAttribute("data-mode");
+        if (mode === currentMode) return;
+
+        currentMode = mode;
+        modeButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        if (currentMode === "puppy") {
+          buddyEmoji.textContent = "🐕‍🦺";
+          buddyLabel.textContent = "tap & breathe";
+        } else {
+          buddyEmoji.textContent = "🐺";
+          buddyLabel.textContent = "tap & listen";
+        }
+
+        msgText.textContent = pickRandomMessage();
+      });
+    });
+  </script>
+</body>
+</html>
